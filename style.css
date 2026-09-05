@@ -13,7 +13,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #fff;
     direction: rtl;
-    touch-action: manipulation; /* جلوگیری از زوم دوبار لمس */
+    touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -155,7 +155,7 @@ body {
     align-items: center;
     justify-content: center;
     transition: background 0.2s, transform 0.1s;
-    touch-action: manipulation;
+    touch-action: none; /* مهم برای پاسخ فوری */
     -webkit-touch-callout: none;
 }
 
