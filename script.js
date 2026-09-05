@@ -1,26 +1,24 @@
 // ==================== تنظیمات اصلی ====================
 const COLS = 10;
 const ROWS = 20;
-const BLOCK_SIZE = 30; // پیکسل پایه (در CSS ممکن است تغییر کند)
+const BLOCK_SIZE = 30; // پیکسل پایه
 const canvas = document.getElementById('tetris-board');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('next-canvas');
 const nextCtx = nextCanvas.getContext('2d');
 
-// تنظیم اندازه واقعی canvas بر اساس CSS برای کیفیت بهتر در موبایل
+// تنظیم اندازه واقعی canvas بر اساس CSS
 function resizeCanvas() {
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
-    // ذخیره نسبت برای رسم
     canvas.blockSize = rect.width / COLS;
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// عناصر نمایش امتیاز و سطح
 const scoreElement = document.getElementById('score');
 const levelElement = document.getElementById('level');
 const linesElement = document.getElementById('lines');
@@ -34,7 +32,7 @@ let lines = 0;
 let level = 1;
 let gameOver = false;
 let paused = false;
-let dropInterval = 1000; // میلی‌ثانیه
+let dropInterval = 1000;
 let lastDropTime = 0;
 let animationId = null;
 
@@ -186,7 +184,6 @@ function drawBoard() {
     const blockSize = canvas.blockSize || BLOCK_SIZE;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // رسم خانه‌های تخته
     for (let y = 0; y < ROWS; y++) {
         for (let x = 0; x < COLS; x++) {
             if (board[y][x]) {
@@ -198,12 +195,10 @@ function drawBoard() {
         }
     }
 
-    // رسم قطعه فعلی
     if (currentPiece && !gameOver) {
         drawPiece(ctx, currentPiece, currentPiece.x, currentPiece.y, blockSize);
     }
 
-    // رسم خطوط شبکه
     ctx.strokeStyle = '#222';
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= COLS; i++) {
@@ -316,29 +311,24 @@ function setupTouchButton(id, action) {
     const btn = document.getElementById(id);
     if (!btn) return;
 
-    // استفاده از pointerdown برای پاسخ سریع در همه دستگاه‌ها
-    btn.addEventListener('pointerdown', (e) => {
-        e.preventDefault(); // جلوگیری از رفتار پیش‌فرض
-        action();
-        drawBoard();
-    });
-
-    // پشتیبان برای مرورگرهایی که pointer events را پشتیبانی نمی‌کنند
-    btn.addEventListener('touchstart', (e) => {
+    // انتخاب رویداد مناسب: pointerdown در مرورگرهای مدرن، وگرنه touchstart
+    const eventName = window.PointerEvent ? 'pointerdown' : 'touchstart';
+    btn.addEventListener(eventName, (e) => {
         e.preventDefault();
         action();
         drawBoard();
     }, { passive: false });
 
-    // برای دسکتاپ (اگر pointerdown پشتیبانی نشود)
-    btn.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        action();
-        drawBoard();
-    });
+    // برای دسکتاپ اگر pointer events پشتیبانی نمی‌شود
+    if (!window.PointerEvent) {
+        btn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            action();
+            drawBoard();
+        });
+    }
 }
 
-// اتصال دکمه‌ها
 setupTouchButton('btn-left', () => {
     if (!paused && !gameOver) currentPiece.moveHorizontal(-1);
 });
@@ -362,7 +352,7 @@ setupTouchButton('btn-drop', () => {
     }
 });
 
-// جلوگیری از اسکرول صفحه هنگام لمس دکمه‌ها
+// جلوگیری از اسکرول هنگام لمس دکمه‌ها
 document.querySelectorAll('.touch-btn').forEach(btn => {
     btn.addEventListener('touchmove', (e) => {
         e.preventDefault();
