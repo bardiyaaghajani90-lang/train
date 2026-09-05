@@ -311,36 +311,62 @@ document.addEventListener('keydown', (e) => {
     drawBoard();
 });
 
-// دکمه‌های لمسی
-document.getElementById('btn-left').addEventListener('click', () => {
+// ==================== کنترل لمسی (اصلاح‌شده) ====================
+function setupTouchButton(id, action) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+
+    // استفاده از pointerdown برای پاسخ سریع در همه دستگاه‌ها
+    btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault(); // جلوگیری از رفتار پیش‌فرض
+        action();
+        drawBoard();
+    });
+
+    // پشتیبان برای مرورگرهایی که pointer events را پشتیبانی نمی‌کنند
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        action();
+        drawBoard();
+    }, { passive: false });
+
+    // برای دسکتاپ (اگر pointerdown پشتیبانی نشود)
+    btn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        action();
+        drawBoard();
+    });
+}
+
+// اتصال دکمه‌ها
+setupTouchButton('btn-left', () => {
     if (!paused && !gameOver) currentPiece.moveHorizontal(-1);
-    drawBoard();
 });
-document.getElementById('btn-right').addEventListener('click', () => {
+setupTouchButton('btn-right', () => {
     if (!paused && !gameOver) currentPiece.moveHorizontal(1);
-    drawBoard();
 });
-document.getElementById('btn-rotate').addEventListener('click', () => {
+setupTouchButton('btn-rotate', () => {
     if (!paused && !gameOver) currentPiece.rotate();
-    drawBoard();
 });
-document.getElementById('btn-down').addEventListener('click', () => {
-    if (!paused && !gameOver && currentPiece.moveDown()) {
+setupTouchButton('btn-down', () => {
+    if (!paused && !gameOver) {
+        if (currentPiece.moveDown()) {
+            lastDropTime = performance.now();
+        }
+    }
+});
+setupTouchButton('btn-drop', () => {
+    if (!paused && !gameOver) {
+        currentPiece.hardDrop();
         lastDropTime = performance.now();
     }
-    drawBoard();
-});
-document.getElementById('btn-drop').addEventListener('click', () => {
-    if (!paused && !gameOver) currentPiece.hardDrop();
-    lastDropTime = performance.now();
-    drawBoard();
 });
 
 // جلوگیری از اسکرول صفحه هنگام لمس دکمه‌ها
 document.querySelectorAll('.touch-btn').forEach(btn => {
-    btn.addEventListener('touchstart', (e) => {
+    btn.addEventListener('touchmove', (e) => {
         e.preventDefault();
-    });
+    }, { passive: false });
 });
 
 // دکمه شروع مجدد
