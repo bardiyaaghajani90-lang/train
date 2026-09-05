@@ -1,11 +1,24 @@
 // ==================== تنظیمات اصلی ====================
 const COLS = 10;
 const ROWS = 20;
-const BLOCK_SIZE = 30; // پیکسل
+const BLOCK_SIZE = 30; // پیکسل پایه (در CSS ممکن است تغییر کند)
 const canvas = document.getElementById('tetris-board');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('next-canvas');
 const nextCtx = nextCanvas.getContext('2d');
+
+// تنظیم اندازه واقعی canvas بر اساس CSS برای کیفیت بهتر در موبایل
+function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    // ذخیره نسبت برای رسم
+    canvas.blockSize = rect.width / COLS;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
 // عناصر نمایش امتیاز و سطح
 const scoreElement = document.getElementById('score');
@@ -55,7 +68,6 @@ class Piece {
         this.y = 0;
     }
 
-    // چرخش ۹۰ درجه در جهت عقربه‌های ساعت
     rotate() {
         const newShape = this.shape[0].map((_, idx) => 
             this.shape.map(row => row[idx]).reverse()
@@ -65,7 +77,6 @@ class Piece {
         }
     }
 
-    // بررسی برخورد با دیوارها یا قطعات موجود
     collision(offsetX, offsetY, shape = this.shape) {
         for (let y = 0; y < shape.length; y++) {
             for (let x = 0; x < shape[y].length; x++) {
@@ -84,7 +95,6 @@ class Piece {
         return false;
     }
 
-    // حرکت به پایین
     moveDown() {
         if (!this.collision(0, 1)) {
             this.y++;
@@ -93,14 +103,12 @@ class Piece {
         return false;
     }
 
-    // حرکت افقی
     moveHorizontal(dx) {
         if (!this.collision(dx, 0)) {
             this.x += dx;
         }
     }
 
-    // فرود سریع
     hardDrop() {
         while (!this.collision(0, 1)) {
             this.y++;
@@ -108,7 +116,6 @@ class Piece {
         this.lockPiece();
     }
 
-    // قفل کردن قطعه روی تخته
     lockPiece() {
         for (let y = 0; y < this.shape.length; y++) {
             for (let x = 0; x < this.shape[y].length; x++) {
@@ -154,19 +161,16 @@ function clearLines() {
             board.splice(y, 1);
             board.unshift(Array(COLS).fill(0));
             linesCleared++;
-            y++; // بررسی دوباره همان ردیف
+            y++;
         }
     }
 
     if (linesCleared > 0) {
-        // امتیازدهی
         const points = [0, 100, 300, 500, 800];
         score += points[linesCleared] * level;
         lines += linesCleared;
         level = Math.floor(lines / 10) + 1;
         dropInterval = Math.max(100, 1000 - (level - 1) * 80);
-
-        // به‌روزرسانی رابط کاربری
         updateUI();
     }
 }
@@ -179,6 +183,7 @@ function updateUI() {
 
 // ==================== رسم روی بوم ====================
 function drawBoard() {
+    const blockSize = canvas.blockSize || BLOCK_SIZE;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // رسم خانه‌های تخته
@@ -186,17 +191,16 @@ function drawBoard() {
         for (let x = 0; x < COLS; x++) {
             if (board[y][x]) {
                 ctx.fillStyle = board[y][x];
-                ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
-                // کمی براقیت
+                ctx.fillRect(x * blockSize, y * blockSize, blockSize - 1, blockSize - 1);
                 ctx.fillStyle = 'rgba(255,255,255,0.1)';
-                ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE - 1, 3);
+                ctx.fillRect(x * blockSize, y * blockSize, blockSize - 1, 3);
             }
         }
     }
 
     // رسم قطعه فعلی
     if (currentPiece && !gameOver) {
-        drawPiece(ctx, currentPiece, currentPiece.x, currentPiece.y);
+        drawPiece(ctx, currentPiece, currentPiece.x, currentPiece.y, blockSize);
     }
 
     // رسم خطوط شبکه
@@ -204,38 +208,38 @@ function drawBoard() {
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= COLS; i++) {
         ctx.beginPath();
-        ctx.moveTo(i * BLOCK_SIZE, 0);
-        ctx.lineTo(i * BLOCK_SIZE, canvas.height);
+        ctx.moveTo(i * blockSize, 0);
+        ctx.lineTo(i * blockSize, ROWS * blockSize);
         ctx.stroke();
     }
     for (let i = 0; i <= ROWS; i++) {
         ctx.beginPath();
-        ctx.moveTo(0, i * BLOCK_SIZE);
-        ctx.lineTo(canvas.width, i * BLOCK_SIZE);
+        ctx.moveTo(0, i * blockSize);
+        ctx.lineTo(COLS * blockSize, i * blockSize);
         ctx.stroke();
     }
 }
 
-function drawPiece(context, piece, offsetX, offsetY) {
+function drawPiece(context, piece, offsetX, offsetY, blockSize) {
     for (let y = 0; y < piece.shape.length; y++) {
         for (let x = 0; x < piece.shape[y].length; x++) {
             if (piece.shape[y][x]) {
-                const drawX = (offsetX + x) * BLOCK_SIZE;
-                const drawY = (offsetY + y) * BLOCK_SIZE;
+                const drawX = (offsetX + x) * blockSize;
+                const drawY = (offsetY + y) * blockSize;
                 context.fillStyle = piece.color;
-                context.fillRect(drawX, drawY, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+                context.fillRect(drawX, drawY, blockSize - 1, blockSize - 1);
                 context.fillStyle = 'rgba(255,255,255,0.2)';
-                context.fillRect(drawX, drawY, BLOCK_SIZE - 1, 3);
+                context.fillRect(drawX, drawY, blockSize - 1, 3);
             }
         }
     }
 }
 
 function drawNextPiece() {
+    const blockSize = 24;
     nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
     if (nextPiece) {
         const shape = nextPiece.shape;
-        const blockSize = 24; // اندازه کوچکتر برای نمایش
         const offsetX = (nextCanvas.width - shape[0].length * blockSize) / 2;
         const offsetY = (nextCanvas.height - shape.length * blockSize) / 2;
 
@@ -271,6 +275,7 @@ function gameLoop(timestamp) {
 }
 
 // ==================== کنترل‌ها ====================
+// صفحه کلید
 document.addEventListener('keydown', (e) => {
     if (gameOver) return;
 
@@ -304,6 +309,38 @@ document.addEventListener('keydown', (e) => {
             break;
     }
     drawBoard();
+});
+
+// دکمه‌های لمسی
+document.getElementById('btn-left').addEventListener('click', () => {
+    if (!paused && !gameOver) currentPiece.moveHorizontal(-1);
+    drawBoard();
+});
+document.getElementById('btn-right').addEventListener('click', () => {
+    if (!paused && !gameOver) currentPiece.moveHorizontal(1);
+    drawBoard();
+});
+document.getElementById('btn-rotate').addEventListener('click', () => {
+    if (!paused && !gameOver) currentPiece.rotate();
+    drawBoard();
+});
+document.getElementById('btn-down').addEventListener('click', () => {
+    if (!paused && !gameOver && currentPiece.moveDown()) {
+        lastDropTime = performance.now();
+    }
+    drawBoard();
+});
+document.getElementById('btn-drop').addEventListener('click', () => {
+    if (!paused && !gameOver) currentPiece.hardDrop();
+    lastDropTime = performance.now();
+    drawBoard();
+});
+
+// جلوگیری از اسکرول صفحه هنگام لمس دکمه‌ها
+document.querySelectorAll('.touch-btn').forEach(btn => {
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+    });
 });
 
 // دکمه شروع مجدد
