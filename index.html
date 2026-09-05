@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی تتریس</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-area">
+            <canvas id="tetris-board" width="300" height="600"></canvas>
+            <div class="side-panel">
+                <div class="next-piece">
+                    <h3>قطعه بعدی</h3>
+                    <canvas id="next-canvas" width="120" height="120"></canvas>
+                </div>
+                <div class="score-panel">
+                    <div class="score">امتیاز: <span id="score">0</span></div>
+                    <div class="level">سطح: <span id="level">1</span></div>
+                    <div class="lines">خطوط: <span id="lines">0</span></div>
+                </div>
+                <button id="restart-btn">شروع مجدد</button>
+                <p class="controls">
+                    کنترل‌ها:<br>
+                    ← → : حرکت افقی<br>
+                    ↑ : چرخش<br>
+                    ↓ : حرکت سریع<br>
+                    Space : فرود سریع<br>
+                    P : توقف/ادامه
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
