@@ -2,63 +2,34 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>تتریس حرفه‌ای</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تتریس</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        <div class="game-area">
-            <div class="board-wrapper">
-                <canvas id="tetris-board" width="300" height="600"></canvas>
-            </div>
-            <div class="side-panel">
-                <div class="next-piece">
-                    <h3>قطعه بعدی</h3>
-                    <canvas id="next-canvas" width="120" height="120"></canvas>
-                </div>
-                <div class="score-panel">
-                    <div class="score">امتیاز: <span id="score">0</span></div>
-                    <div class="level">سطح: <span id="level">1</span></div>
-                    <div class="lines">خطوط: <span id="lines">0</span></div>
-                    <div class="challenge">چالش: <span id="challenge-text">بدون چالش</span></div>
-                </div>
-                <button id="restart-btn">شروع مجدد</button>
-                <p class="controls">
-                    کامپیوتر:<br>
-                    ← → : حرکت افقی<br>
-                    ↑ : چرخش<br>
-                    ↓ : حرکت سریع<br>
-                    Space : فرود سریع<br>
-                    P : توقف/ادامه
-                </p>
-            </div>
+        <div class="main-panel">
+            <canvas id="board"></canvas>
         </div>
-
-        <!-- دکمه‌های لمسی -->
+        <div class="side-panel">
+            <div class="next-piece">
+                <span>قطعه بعدی</span>
+                <canvas id="next" width="120" height="120"></canvas>
+            </div>
+            <div class="info">
+                <p>امتیاز: <span id="score">0</span></p>
+                <p>سطح: <span id="level">1</span></p>
+                <p>خطوط: <span id="lines">0</span></p>
+            </div>
+            <button id="restart">شروع مجدد</button>
+        </div>
         <div class="touch-controls">
-            <div class="touch-row">
-                <button class="touch-btn" id="btn-left">◀</button>
-                <button class="touch-btn" id="btn-rotate">↻</button>
-                <button class="touch-btn" id="btn-right">▶</button>
-            </div>
-            <div class="touch-row">
-                <button class="touch-btn" id="btn-down">▼</button>
-                <button class="touch-btn" id="btn-drop">⬇ فرود</button>
-            </div>
-        </div>
-
-        <!-- مودال پایان بازی -->
-        <div id="game-over-modal" class="modal">
-            <div class="modal-content">
-                <h2>🎮 بازی تمام شد!</h2>
-                <p>امتیاز نهایی: <span id="final-score">0</span></p>
-                <p>بالاترین امتیاز: <span id="high-score">0</span></p>
-                <button id="modal-restart-btn">شروع مجدد</button>
-            </div>
+            <button id="moveLeft">◀</button>
+            <button id="rotate">↻</button>
+            <button id="moveRight">▶</button>
+            <button id="hardDrop">⬇ فرود</button>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
