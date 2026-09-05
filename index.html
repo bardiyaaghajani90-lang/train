@@ -2,14 +2,16 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی تتریس</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>بازی تتریس - نسخه موبایل و دسکتاپ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
         <div class="game-area">
-            <canvas id="tetris-board" width="300" height="600"></canvas>
+            <div class="board-wrapper">
+                <canvas id="tetris-board" width="300" height="600"></canvas>
+            </div>
             <div class="side-panel">
                 <div class="next-piece">
                     <h3>قطعه بعدی</h3>
@@ -22,13 +24,25 @@
                 </div>
                 <button id="restart-btn">شروع مجدد</button>
                 <p class="controls">
-                    کنترل‌ها:<br>
+                    کامپیوتر:<br>
                     ← → : حرکت افقی<br>
                     ↑ : چرخش<br>
                     ↓ : حرکت سریع<br>
                     Space : فرود سریع<br>
                     P : توقف/ادامه
                 </p>
+            </div>
+        </div>
+        <!-- دکمه‌های لمسی برای موبایل -->
+        <div class="touch-controls">
+            <div class="touch-row">
+                <button class="touch-btn" id="btn-left">←</button>
+                <button class="touch-btn" id="btn-rotate">⟳</button>
+                <button class="touch-btn" id="btn-right">→</button>
+            </div>
+            <div class="touch-row">
+                <button class="touch-btn" id="btn-down">↓</button>
+                <button class="touch-btn" id="btn-drop">⤓ فرود</button>
             </div>
         </div>
     </div>
